@@ -1,16 +1,6 @@
 import numpy as np
 import cv2
 import math
-#import RPi.GPIO as GPIO
-
-def process(image):
-	img = cv2.cvtColor(image,cv2.COLOR_BGR2GRAY)
-	img = cv2.GaussianBlur(img,(5,5),0)
-	ret2,img = cv2.threshold(img,127,255,cv2.THRESH_OTSU)
-	leftimg = img[0:height,0:center_x]
-	rightimg = img[0:height,center_x:width]
-	is_left = np.average(leftimg) > np.average(rightimg)
-	return img, is_left
 
 def rpiSetup():
 	import RPi.GPIO as GPIO
@@ -20,11 +10,16 @@ def rpiSetup():
 
 def captureSetup():
 	cap = cv2.VideoCapture(1)
-	cap.open(1)
 	ret ,img = cap.read()
 	cv2.imshow('img',img)
 	cv2.moveWindow('img', 0,0)
 	return cap
+
+def metrics(cap):
+	h = cap.get(4)
+	w = cap.get(3)
+	cx, cy = int(w/2),int(h/2)
+	return h, w, cx, cy
 
 def leftTurn():
     	textHUD('LEFT')
@@ -36,25 +31,28 @@ def rightTurn():
 
 def textHUD(dirtext):
 	font = cv2.FONT_HERSHEY_SIMPLEX
-	cv2.putText(img, dirtext,(center_x,center_y),font,4,(0,255,255),2)
+	cv2.putText(img, dirtext,(cx,cy),font,4,(0,255,255),2)
+
+def process(frame):
+	img = cv2.cvtColor(frame,cv2.COLOR_BGR2GRAY)
+	img = cv2.GaussianBlur(img,(5,5),0)
+	ret,img = cv2.threshold(img,127,255,cv2.THRESH_OTSU)
+	l_img = img[0:h,0:cx]
+	r_img = img[0:h,cx:w]
+	is_left = np.average(l_img) > np.average(r_img)
+	return img, is_left
 
 #rpiSetup()
 cap = captureSetup()
-height = cap.get(4)
-width = cap.get(3)
-center_x, center_y = int(width/2),int(height/2)
-
+h, w, cx, cy = metrics(cap)
 while(True):
-    #get frame and convert to HSV space
-    ret ,frame = cap.read()
+    ret, frame = cap.read()
     img, left = process(frame)
     img = cv2.cvtColor(img,cv2.COLOR_GRAY2BGR)
     if left:
     	leftTurn()
     else:
     	rightTurn()
-
-    #display and position window
     cv2.imshow('img',img)
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
