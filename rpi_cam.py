@@ -6,7 +6,10 @@ def rpiSetup():
 	import RPi.GPIO as GPIO
 	GPIO.setmode(GPIO.BCM)
 	GPIO.setwarnings(False)
-	GPIO.setup(18, GPIO.OUT)
+	GPIO.setup(11, GPIO.OUT) #in1
+	GPIO.setup(12, GPIO.OUT) #in2
+	GPIO.setup(13, GPIO.OUT) #in3
+	GPIO.setup(15, GPIO.OUT) #in4
 
 def captureSetup():
 	cap = cv2.VideoCapture(1)
@@ -21,6 +24,31 @@ def metrics(cap):
 	cx, cy = int(w/2),int(h/2)
 	return h, w, cx, cy
 
+#left and right motor forward, back, and stop functions
+def Lmtrfwd():
+	GPIO.output(11, 1)
+	GPIO.output(12, 0)
+	
+def Lmtrbk():
+	GPIO.output(11, 0)
+	GPIO.output(12, 1)
+
+def Lmtrstp():
+	GPIO.output(11, 0)
+	GPIO.output(12, 0)
+	
+def Rmtrfwd():
+	GPIO.output(13, 1)
+	GPIO.output(15, 0)
+	
+def Rmtrbk():
+	GPIO.output(13, 0)
+	GPIO.output(15, 1)
+
+def Rmtrstp():
+	GPIO.output(13, 0)
+	GPIO.output(15, 0)
+	
 def leftTurn():
     	textHUD('LEFT')
 	#GPIO.output(18, 1)
