@@ -82,7 +82,7 @@ def cam():
 	cv2.imshow('img',img)
 
 GPIO = rpiSetup()
-Rmtrstp()
+Rmtrfwd()
 #cap = captureSetup(0)
 #h, w, cx, cy = metrics(cap)
 while(True):
