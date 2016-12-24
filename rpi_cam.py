@@ -51,12 +51,10 @@ def Rmtrstp():
 	GPIO.output(15, 0)
 	
 def leftTurn():
-    	textHUD('LEFT')
-	#GPIO.output(18, 1)
+    	GPIO.output(18, 1)
 
 def rightTurn():
-    	textHUD('RIGHT')
-	#GPIO.output(18, 0)
+    	GPIO.output(18, 0)
 
 def textHUD(dirtext):
 	font = cv2.FONT_HERSHEY_SIMPLEX
@@ -64,29 +62,32 @@ def textHUD(dirtext):
 
 def process(frame):
 	img = cv2.cvtColor(frame,cv2.COLOR_BGR2GRAY)
-	img = cv2.GaussianBlur(img,(5,5),0)
-	ret,img = cv2.threshold(img,127,255,cv2.THRESH_OTSU)
+	#img = cv2.GaussianBlur(img,(5,5),0)
+	#ret,img = cv2.threshold(img,127,255,cv2.THRESH_OTSU)
 	l_img = img[0:h,0:cx]
 	r_img = img[0:h,cx:w]
 	is_left = np.average(l_img) > np.average(r_img)
 	return img, is_left
 
 def cam():
+	global img
 	ret, frame = cap.read()
 	img, left = process(frame)
 	img = cv2.cvtColor(img,cv2.COLOR_GRAY2BGR)
 	if left:
-		leftTurn()
+		#leftTurn()
+		textHUD('LEFT')
 	else:
-		rightTurn()
+		#rightTurn()
+		textHUD('RIGHT')
 	cv2.imshow('img',img)
 
-GPIO = rpiSetup()
-Rmtrstp()
-#cap = captureSetup(0)
-#h, w, cx, cy = metrics(cap)
+#GPIO = rpiSetup()
+#Rmtrstp()
+cap = captureSetup(0)
+h, w, cx, cy = metrics(cap)
 while(True):
-    #cam()
+    cam()
     
 
     if cv2.waitKey(1) & 0xFF == ord('q'):

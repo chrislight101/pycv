@@ -20,7 +20,7 @@ def sample():
     try:
       s = int((s[0]))
     except ValueError:
-      sample()
+      sample() #just retry in event of bad serial read
     if s <= maxread:
 		avgsum -= samples[index]
 		samples[index] = s
