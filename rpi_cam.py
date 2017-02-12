@@ -51,28 +51,42 @@ def Rmtrstp():
 	GPIO.output(15, 0)
 	
 def leftTurn():
-    	GPIO.output(18, 1)
+    GPIO.output(18, 1)
 
 def rightTurn():
-    	GPIO.output(18, 0)
+    GPIO.output(18, 0)
 
 def textHUD(dirtext):
 	font = cv2.FONT_HERSHEY_SIMPLEX
 	cv2.putText(img, dirtext,(cx,cy),font,4,(0,255,255),2)
 
-def process(frame):
-	img = cv2.cvtColor(frame,cv2.COLOR_BGR2GRAY)
-	#img = cv2.GaussianBlur(img,(5,5),0)
-	#ret,img = cv2.threshold(img,127,255,cv2.THRESH_OTSU)
+def process(img):
+	#img = cv2.resize(img, (0,0), fx=0.5, fy=0.5)
+	kernel = np.ones((3,3),np.uint8)
+	gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
+	
+	
+	
+	
+	adthresh = cv2.adaptiveThreshold(gray,255,cv2.ADAPTIVE_THRESH_MEAN_C,cv2.THRESH_BINARY,3,1)
+	blur = cv2.GaussianBlur(gray,(5,5),0)
+	ret,thresh = cv2.threshold(gray,10,255,cv2.THRESH_BINARY)
+	edges = cv2.Canny(blur,50,150)
+	close = cv2.morphologyEx(edges,cv2.MORPH_CLOSE,kernel)
+	corners = cv2.cornerHarris(edges,5,5,0.0001)
+    	
+	
+	
 	l_img = img[0:h,0:cx]
 	r_img = img[0:h,cx:w]
 	is_left = np.average(l_img) > np.average(r_img)
-	return img, is_left
+	return corners, is_left
 
 def cam():
 	global img
 	ret, frame = cap.read()
 	img, left = process(frame)
+	
 	img = cv2.cvtColor(img,cv2.COLOR_GRAY2BGR)
 	if left:
 		#leftTurn()
@@ -80,11 +94,12 @@ def cam():
 	else:
 		#rightTurn()
 		textHUD('RIGHT')
+
 	cv2.imshow('img',img)
 
 #GPIO = rpiSetup()
 #Rmtrstp()
-cap = captureSetup(0)
+cap = captureSetup(1)
 h, w, cx, cy = metrics(cap)
 while(True):
     cam()
