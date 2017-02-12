@@ -1,5 +1,14 @@
 import numpy as np
 import cv2
+import picamera
+from time import sleep
+from picamera import PiCamera
+from picamera.array import PiRGBArray
+
+camera = PiCamera()
+camera.resolution = (320,240)
+camera.framerate = 24
+sleep(2)
 
 ###open feed and calculate center
 cap = cv2.VideoCapture(0)
@@ -48,8 +57,8 @@ while(True):
     green = cv2.cvtColor(green,cv2.COLOR_GRAY2BGR)
     if corners is not None:
         corners = np.int0(corners)
-        print corners.ndim
-        print "\n"
+        #print corners.ndim
+        #print "\n"
         for i in corners:
             x,y = i.ravel()
             cv2.circle(frame,(x,y),5,(255,0,255),-1)
