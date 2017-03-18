@@ -48,15 +48,6 @@ def process(frame):
     img = cv2.GaussianBlur(img,(5,5),0)
     x = img
 
-    #contours, hierarchy = cv2.findContours(x,1,2)
-    #cnt = contours[0]
-    #print(contours.shape)
-    #M = cv2.moments(cnt)
-    #cx = int(M['m10']/M['m00'])
-    #cy = int(M['m01']/M['m00'])
-    #cx = 0
-    #cy = 0
-    
     l_avg, r_avg = np.average(img[0:h,0:cx]), np.average(img[0:h,cx:w])
     img = cv2.cvtColor(img,cv2.COLOR_GRAY2BGR)
     return img, l_avg, r_avg
