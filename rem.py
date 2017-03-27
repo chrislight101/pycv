@@ -11,6 +11,8 @@ camera.resolution = (h,w)
 camera.framerate = 30
 rawCapture = PiRGBArray(camera,size=(h,w))
 
+out = cv2.VideoWriter('output.avi',-1,20.0,(320,240))
+
 for frame in camera.capture_continuous(rawCapture, format='bgr',use_video_port=True):
     frame = frame.array
     
@@ -19,9 +21,16 @@ for frame in camera.capture_continuous(rawCapture, format='bgr',use_video_port=T
     #kernel = np.ones((3,3,np.uint8)
     #img = cv2.morphologyEx(img, cv2.MORPH_OPEN, kernel)
 
+    #frame = cv2.resize(img,(320,240))
+    out.write(img)
+    
     cv2.imshow('img',img)
     #cv2.moveWindow('img',0,0)
     key = cv2.waitKey(1) & 0xFF
     rawCapture.truncate(0)
     if key == ord('q'):
         break
+        
+cap.release()
+out.release()
+cv2.destroyAllWindows()
