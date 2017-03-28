@@ -31,6 +31,5 @@ for frame in camera.capture_continuous(rawCapture, format='bgr',use_video_port=T
     if key == ord('q'):
         break
         
-cap.release()
 out.release()
 cv2.destroyAllWindows()
