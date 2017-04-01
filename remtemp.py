@@ -2,6 +2,7 @@ import numpy as np
 import cv2
 import time
 import timeit
+from collections import deque
 
 #open feed and calculate center
 cap = cv2.VideoCapture(1)
@@ -16,6 +17,8 @@ cx,cy = int(cap.get(3)/2),int(cap.get(4)/2)
 timeconst = 1491000000
 timestart = time.time()
 f = open('data.csv','w')
+font = cv2.FONT_HERSHEY_SIMPLEX
+samples = deque(np.zeros(100))
 
 while(True):
     ret ,frame = cap.read()
@@ -27,18 +30,19 @@ while(True):
     
     img = cv2.cvtColor(frame,cv2.COLOR_BGR2GRAY)
     ret,img = cv2.threshold(img,50,255,cv2.THRESH_BINARY)
-    l_avg, r_avg = np.average(img[0:h,0:cx]), np.average(img[0:h,cx:w])
+    #l_avg, r_avg = np.average(img[0:h,0:cx]), np.average(img[0:h,cx:w])
     avg = np.average(img)
- 
- 
+    samples.append(avg)
+    samples.popleft()
+    ma = np.average(samples)
  
  
  
  
     
-    img = cv2.cvtColor(img,cv2.COLOR_GRAY2BGR)
-    font = cv2.FONT_HERSHEY_SIMPLEX
-    txt = str(timeit.timeit())
+    img = cv2.cvtColor(img,cv2.COLOR_GRAY2BGR)  
+    txt = str(ma)
+    #txt = str(timeit.timeit())
     f.write(str(time.time()-timestart) + ',' + str(avg) + '\r\n')
     cv2.putText(img, txt,(30,30),font,0.9,(0,0,255),2)    
     #display and position window
