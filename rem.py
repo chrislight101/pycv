@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 import time
+from collections import deque
 import picamera
 from picamera import PiCamera
 from picamera.array import PiRGBArray
@@ -15,6 +16,7 @@ rawCapture = PiRGBArray(camera,size=(h,w))
 out = cv2.VideoWriter('output.avi',-1,20.0,(320,240))
 timestart = time.time()
 f = open('data.csv','w')
+samples = deque(np.zeros(100))
 
 for frame in camera.capture_continuous(rawCapture, format='bgr',use_video_port=True):
     frame = frame.array
@@ -26,7 +28,9 @@ for frame in camera.capture_continuous(rawCapture, format='bgr',use_video_port=T
     img = cv2.cvtColor(frame,cv2.COLOR_BGR2GRAY)
     ret,img = cv2.threshold(img,50,255,cv2.THRESH_BINARY)
     avg = np.average(img)
-
+    samples.append(avg)
+    samples.popleft()
+    ma = np.average(samples)
 
 
 
