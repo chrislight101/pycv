@@ -13,6 +13,8 @@ camera.framerate = 30
 rawCapture = PiRGBArray(camera,size=(h,w))
 
 out = cv2.VideoWriter('output.avi',-1,20.0,(320,240))
+timestart = time.time()
+f = open('data.csv','w')
 
 for frame in camera.capture_continuous(rawCapture, format='bgr',use_video_port=True):
     frame = frame.array
@@ -31,6 +33,7 @@ for frame in camera.capture_continuous(rawCapture, format='bgr',use_video_port=T
 
     img = cv2.cvtColor(img,cv2.COLOR_GRAY2BGR)
     font = cv2.FONT_HERSHEY_SIMPLEX
+    f.write(str(time.time()-timestart) + ',' + str(avg) + '\r\n')
     txt = str(avg)
     cv2.putText(img, txt,(30,30),font,0.9,(0,0,255),2)    
     cv2.imshow('img',img)
@@ -39,6 +42,7 @@ for frame in camera.capture_continuous(rawCapture, format='bgr',use_video_port=T
     rawCapture.truncate(0)
     if key == ord('q'):
         break
-        
+
+f.close()        
 out.release()
 cv2.destroyAllWindows()
