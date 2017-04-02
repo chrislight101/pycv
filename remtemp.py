@@ -10,15 +10,20 @@ cap.open(1)
 ret ,frame = cap.read()
 ret ,frame = cap.read()
 ret ,frame = cap.read()
+frame = cv2.resize(frame,(0,0), fx=.5, fy=.5)
 print(cap.isOpened())
 h = int(cap.get(4))
 w = int(cap.get(3))
 cx,cy = int(cap.get(3)/2),int(cap.get(4)/2)
+height, width, layers = frame.shape
 timeconst = 1491000000
 timestart = time.time()
 f = open('data.csv','w')
 font = cv2.FONT_HERSHEY_SIMPLEX
 samples = deque(np.zeros(100))
+
+fourcc = cv2.VideoWriter_fourcc(*'WMV1')
+out = cv2.VideoWriter('vid.avi',fourcc,20.0,(width,height))
 
 while(True):
     ret ,frame = cap.read()
@@ -36,7 +41,7 @@ while(True):
     samples.popleft()
     ma = np.average(samples)
  
- 
+    out.write(img)
  
  
     
@@ -51,6 +56,7 @@ while(True):
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
 
-f.close()    
+f.close()  
+out.release()  
 cap.release()
 cv2.destroyAllWindows()
