@@ -29,8 +29,8 @@ samples = deque(np.zeros(100))
 
 def led(pwm,pulsems,duration):
     ledstart = time.time()
-    pulsems = pulsems / 1000
-    while(time.time - ledstart < duration):
+    pulsems = float(pulsems / 1000.)
+    while(time.time() - ledstart < duration):
         p.ChangeDutyCycle(pwm)
         time.sleep(pulsems)
         p.ChangeDutyCycle(0)
@@ -53,7 +53,8 @@ for frame in camera.capture_continuous(rawCapture, format='bgr',use_video_port=T
     samples.popleft()
     ma = np.average(samples)
 
-    led(50,100,2) # 100ms pulses at 50% for 2 seconds
+    if (ma>200):
+        led(50,500,10) # 100ms pulses at 50% for 2 seconds
     
     
     
