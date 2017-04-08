@@ -14,14 +14,14 @@ camera.framerate = 30
 rawCapture = PiRGBArray(camera,size=(h,w))
 counter = 1
 thresh = 50
-
+autothreshold = False
 
 import RPi.GPIO as GPIO
 GPIO.setmode(GPIO.BOARD)
 GPIO.setwarnings(False)
 GPIO.setup(11,GPIO.OUT)
 p = GPIO.PWM(11,50)
-p.start(0)
+p.start(50)
 
 
 out = cv2.VideoWriter('output.avi',-1,20.0,(320,240))
@@ -90,10 +90,11 @@ for frame in camera.capture_continuous(rawCapture, format='bgr',use_video_port=T
         thresh = thresh + 5
     if key == ord('k'):
         thresh = thresh - 5
-    if avg < 127:
-        thresh = thresh - 2
-    if avg > 128:
-        thresh = thresh + 2
+    if autothreshold:
+        if avg < 127:
+            thresh = thresh - 2
+        if avg > 128:
+            thresh = thresh + 2
     if key == ord('q'):
         break
 
