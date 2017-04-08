@@ -26,8 +26,8 @@ autothreshold = True
 imwritecounter = 0
 
 
-fourcc = cv2.VideoWriter_fourcc(*'WMV1')
-out = cv2.VideoWriter('vid.avi',fourcc,20.0,(width,height))
+#fourcc = cv2.VideoWriter_fourcc(*'WMV1')
+#out = cv2.VideoWriter('vid.avi',fourcc,20.0,(width,height))
 
 while(True):
     ret ,frame = cap.read()
