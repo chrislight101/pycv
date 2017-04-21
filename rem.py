@@ -5,6 +5,7 @@ from collections import deque
 import picamera
 from picamera import PiCamera
 from picamera.array import PiRGBArray
+import pygame
 
 #camera module setup
 h = 640
@@ -18,35 +19,23 @@ rawCapture = PiRGBArray(camera,size=(h,w))
 imwritecounter = 1
 thresh = 160
 autothreshold = True
-LEDon = False
+LEDon = True
 timeout = 100
 avgcenter = 160
 timestart = time.time()
-samples = deque(np.zeros(100))
+samples = deque(np.zeros(50))
 
 #GPIO PWM setup
 import RPi.GPIO as GPIO
 GPIO.setmode(GPIO.BOARD)
 GPIO.setwarnings(False)
 GPIO.setup(11,GPIO.OUT)
-p = GPIO.PWM(11,50)
-p.start(50)
+p = GPIO.PWM(11,10)
+p.start(0)
 
 #video writing
 out = cv2.VideoWriter('output.avi',-1,20.0,(320,240))
 f = open('data.csv','w')
-
-#LED pulse function        
-def led(pwm,pulsems,duration):
-    ledstart = time.time()
-    pulsems = float(pulsems / 1000.)
-    while(time.time() - ledstart < duration):
-        p.ChangeDutyCycle(pwm)
-        time.sleep(pulsems)
-        p.ChangeDutyCycle(0)
-        time.sleep(pulsems)
-    
-    p.ChangeDutyCycle(0)
 
 ###MAINLOOP###    
 for frame in camera.capture_continuous(rawCapture, format='bgr',use_video_port=True):
@@ -64,8 +53,9 @@ for frame in camera.capture_continuous(rawCapture, format='bgr',use_video_port=T
 
     #LED pulse triggering
     if (ma>200 and LEDon and timeout > 100):
-        triggered = True
-        led(50,500,5) # 500ms pulses at 50% for 2 seconds
+        p.ChangeDutyCycle(50)
+        time.sleep(5)
+        p.ChangeDutyCycle(0)
         timeout = 0
     timeout = timeout + 1
   
@@ -91,7 +81,6 @@ for frame in camera.capture_continuous(rawCapture, format='bgr',use_video_port=T
             avgcenter = avgcenter + 5
         if key == ord('k'):
             avgcenter = avgcenter - 5
-        triggered = True
         if avg < avgcenter:
             thresh = thresh - 2
         if avg > avgcenter:
