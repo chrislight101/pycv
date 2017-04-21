@@ -16,8 +16,11 @@ rawCapture = PiRGBArray(camera,size=(h,w))
 
 #main variables
 imwritecounter = 1
-thresh = 50
-autothreshold = False
+thresh = 160
+autothreshold = True
+LEDon = False
+timeout = 100
+avgcenter = 160
 timestart = time.time()
 samples = deque(np.zeros(100))
 
@@ -60,9 +63,11 @@ for frame in camera.capture_continuous(rawCapture, format='bgr',use_video_port=T
     ma = np.average(samples)
 
     #LED pulse triggering
-    #if (ma>200):
-        #led(50,500,10) # 100ms pulses at 50% for 2 seconds
-    
+    if (ma>200 and LEDon and timeout > 100):
+        triggered = True
+        led(50,500,5) # 500ms pulses at 50% for 2 seconds
+        timeout = 0
+    timeout = timeout + 1
   
     #convert back to BGR for color text display
     img = cv2.cvtColor(img,cv2.COLOR_GRAY2BGR)
@@ -76,16 +81,27 @@ for frame in camera.capture_continuous(rawCapture, format='bgr',use_video_port=T
     if key == ord('x'):
         cv2.imwrite('../frame' + str(imwritecounter) + '.png',img)
         imwritecounter = imwritecounter + 1
-    if key == ord('i'):
-        thresh = thresh + 5
-    if key == ord('k'):
-        thresh = thresh - 5
+    if not autothreshold:
+        if key == ord('i'):
+            thresh = thresh + 5
+        if key == ord('k'):
+            thresh = thresh - 5
+    else:
+        if key == ord('i'):
+            avgcenter = avgcenter + 5
+        if key == ord('k'):
+            avgcenter = avgcenter - 5
+        triggered = True
+        if avg < avgcenter:
+            thresh = thresh - 2
+        if avg > avgcenter:
+            thresh = thresh + 2
     
     #autothreshold    
     if autothreshold:
-        if avg < 127:
+        if avg < avgcenter:
             thresh = thresh - 2
-        if avg > 128:
+        if avg > avgcenter:
             thresh = thresh + 2
 
     #display and position window
