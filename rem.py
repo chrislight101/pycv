@@ -37,7 +37,7 @@ p.start(0)
 #video writing
 out = cv2.VideoWriter('output.avi',-1,20.0,(320,240))
 f = open('data.csv','w')
-f.write('Time,Average,MvgAvg,Sum,Med\r\n')
+f.write('Time,Average,MvgAvg,Sum,Stddev\r\n')
 
 ###MAINLOOP###    
 for frame in camera.capture_continuous(rawCapture, format='bgr',use_video_port=True):
@@ -51,7 +51,7 @@ for frame in camera.capture_continuous(rawCapture, format='bgr',use_video_port=T
 
     avg = np.mean(img)
     imsum = np.sum(img)
-    med = np.median(frame)
+    std = np.std(img)
 
     samples.append(avg)
     samples.popleft()
@@ -71,7 +71,7 @@ for frame in camera.capture_continuous(rawCapture, format='bgr',use_video_port=T
 
     timestr =  str(time.time()-timestart)
     if filewrite:
-        f.write(timestr + ',' + str(avg) + ',' + str(ma) +  ',' + str(imsum) + ',' + str(med) + '\r\n')
+        f.write(timestr + ',' + str(avg) + ',' + str(ma) +  ',' + str(imsum) + ',' + str(std) + '\r\n')
 
     cv2.putText(img, str(avg),(30,30),font,0.7,(0,0,255),2)    
 
