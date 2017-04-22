@@ -19,7 +19,8 @@ rawCapture = PiRGBArray(camera,size=(h,w))
 imwritecounter = 1
 thresh = 160
 autothreshold = True
-LEDon = True
+LEDon = False
+filewrite = False
 timeout = 100
 avgcenter = 160
 timestart = time.time()
@@ -36,6 +37,7 @@ p.start(0)
 #video writing
 out = cv2.VideoWriter('output.avi',-1,20.0,(320,240))
 f = open('data.csv','w')
+f.write('Time,Average,MvgAvg,Sum,Med\r\n')
 
 ###MAINLOOP###    
 for frame in camera.capture_continuous(rawCapture, format='bgr',use_video_port=True):
@@ -45,8 +47,12 @@ for frame in camera.capture_continuous(rawCapture, format='bgr',use_video_port=T
    
     #convert to grayscale, threshold, averaging
     img = cv2.cvtColor(frame,cv2.COLOR_BGR2GRAY)
-    ret,img = cv2.threshold(img,thresh,255,cv2.THRESH_BINARY)
-    avg = np.average(img)
+    ret,img = cv2.threshold(img,25,255,cv2.THRESH_BINARY)
+
+    avg = np.mean(img)
+    imsum = np.sum(img)
+    med = np.median(frame)
+
     samples.append(avg)
     samples.popleft()
     ma = np.average(samples)
@@ -62,15 +68,20 @@ for frame in camera.capture_continuous(rawCapture, format='bgr',use_video_port=T
     #convert back to BGR for color text display
     img = cv2.cvtColor(img,cv2.COLOR_GRAY2BGR)
     font = cv2.FONT_HERSHEY_SIMPLEX
-    f.write(str(time.time()-timestart) + ',' + str(avg) + '\r\n')
-    txt = str(avg)
-    cv2.putText(img, txt,(30,30),font,0.7,(0,0,255),2)    
+
+    timestr =  str(time.time()-timestart)
+    if filewrite:
+        f.write(timestr + ',' + str(avg) + ',' + str(ma) +  ',' + str(imsum) + ',' + str(med) + '\r\n')
+
+    cv2.putText(img, str(avg),(30,30),font,0.7,(0,0,255),2)    
 
     #keyboard commands for frame capture and manual thresholding
     key = cv2.waitKey(1) & 0xFF
     if key == ord('x'):
         cv2.imwrite('../frame' + str(imwritecounter) + '.png',img)
         imwritecounter = imwritecounter + 1
+    if key == ord('w'):
+        filewrite = True
     if not autothreshold:
         if key == ord('i'):
             thresh = thresh + 5
@@ -83,15 +94,10 @@ for frame in camera.capture_continuous(rawCapture, format='bgr',use_video_port=T
             avgcenter = avgcenter - 5
         if avg < avgcenter:
             thresh = thresh - 2
-        if avg > avgcenter:
+        if avg > avgcenter + 1:
             thresh = thresh + 2
     
-    #autothreshold    
-    if autothreshold:
-        if avg < avgcenter:
-            thresh = thresh - 2
-        if avg > avgcenter:
-            thresh = thresh + 2
+    print(str(avg))
 
     #display and position window
     cv2.imshow('img',img)
