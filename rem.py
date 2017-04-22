@@ -53,9 +53,11 @@ for frame in camera.capture_continuous(rawCapture, format='bgr',use_video_port=T
     imsum = np.sum(img)
     std = np.std(img)
 
-    samples.append(avg)
+    samples.append(imsum)
     samples.popleft()
     ma = np.average(samples)
+
+    print(str(np.std(samples) / 1000))
 
     #LED pulse triggering
     if (ma>200 and LEDon and timeout > 100):
@@ -97,7 +99,7 @@ for frame in camera.capture_continuous(rawCapture, format='bgr',use_video_port=T
         if avg > avgcenter + 1:
             thresh = thresh + 2
     
-    print(str(avg))
+    
 
     #display and position window
     cv2.imshow('img',img)
