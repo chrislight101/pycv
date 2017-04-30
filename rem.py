@@ -47,7 +47,7 @@ for frame in camera.capture_continuous(rawCapture, format='bgr',use_video_port=T
    
     #convert to grayscale, threshold, averaging
     img = cv2.cvtColor(frame,cv2.COLOR_BGR2GRAY)
-    ret,img = cv2.threshold(img,25,255,cv2.THRESH_BINARY)
+    ret,img = cv2.threshold(img,thresh,255,cv2.THRESH_BINARY)
 
     avg = np.mean(img)
     imsum = np.sum(img)
@@ -94,10 +94,10 @@ for frame in camera.capture_continuous(rawCapture, format='bgr',use_video_port=T
             avgcenter = avgcenter + 5
         if key == ord('k'):
             avgcenter = avgcenter - 5
-        if avg < avgcenter:
-            thresh = thresh - 2
+        if avg < avgcenter - 1:
+            thresh = thresh - 1
         if avg > avgcenter + 1:
-            thresh = thresh + 2
+            thresh = thresh + 1
     
     
 
