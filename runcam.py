@@ -2,8 +2,8 @@ import numpy as np
 import cv2
 
 #open feed and calculate center
-cap = cv2.VideoCapture(1)
-cap.open(1)
+cap = cv2.VideoCapture(0)
+cap.open(0)
 ret ,frame = cap.read()
 print(cap.isOpened())
 #center_x, center_y = int(cap.get(3)/2),int(cap.get(4)/2)
