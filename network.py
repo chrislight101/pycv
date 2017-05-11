@@ -1,4 +1,5 @@
 import tensorflow as tf
+import matplotlib.image as mpimg
 
 x = tf.placeholder(tf.float32, shape=[None, 768])
 y_ = tf.placeholder(tf.float32, shape=[None, 2])
@@ -50,13 +51,14 @@ train_step = tf.train.AdamOptimizer(1e-4).minimize(cross_entropy)
 correct_prediction = tf.equal(tf.argmax(y_conv, 1), tf.argmax(y_, 1))
 accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
 
-filename_queue = tf.train.string_input_producer(["file0.csv"])
-reader = tf.TextLineReader()
-key, value = reader.read(filename_queue)
+filename_queue = tf.train.string_input_producer(tf.train.match_filenames_once("*.png"))
+image_reader = tf.WholeFileReader()
+key, image_file = image_reader.read(filename_queue)
+my_img = tf.image.decode_png(image_file)
 
-
-tf.global_variables_initializer().run()
 with tf.Session() as sess:
+    tf.global_variables_initializer().run()
+    coord = tf.train.Coordinator()
     sess.run(train_step, feed_dict={x: , y_:})
 
 
