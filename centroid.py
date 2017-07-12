@@ -6,6 +6,7 @@ ret,thresh = cv2.threshold(img,127,255,2)
 contours = cv2.findContours(thresh,1,2)
 
 cnt = contours[0]
+print(cnt)
 M = cv2.moments(cnt)
 cx = int(M['m10']/M['m00'])
 cy = int(M['m01']/M['m00'])
